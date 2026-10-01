@@ -1,5 +1,4 @@
 package ru.practicum.moviehub.http;
-import com.google.gson.Gson;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,46 +17,61 @@ import java.util.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class MoviesApiTest {
+public class MoviesFilterTest {
     private static final String BASE = "http://localhost:8080";
     private static final int port = 8080;
     private static MoviesServer server;
     private static HttpClient client;
     private static final MoviesStore moviesStore = new MoviesStore();
-    private static final Gson gson = new Gson();
 
     @BeforeAll
     static void beforeAll() {
         server = new MoviesServer(moviesStore, port);
         server.start();
         client = HttpClient.newBuilder()
-                .connectTimeout(Duration.ofSeconds(2))
-                .build();
+            .connectTimeout(Duration.ofSeconds(2))
+            .build();
     }
 
     @BeforeEach
     void beforeEach() {
         moviesStore.clear();
+        moviesStore.add(new Movie("Mortal Combat", 2026));
+        moviesStore.add(new Movie("Dune2", 2013));
+        moviesStore.add(new Movie("Vladimir", 2013));
     }
 
     @AfterAll
     static void afterAll() {
-        server.stop();
+    server.stop();
+}
+
+    @Test
+    void filterMovieByYearAndStatusMustBe200() throws Exception {
+        HttpRequest req = HttpRequest.newBuilder()
+            .uri(URI.create(BASE + "/movies?year=2013"))
+            .header("Content-Type", "application/json")
+            .GET()
+            .build();
+
+        HttpResponse<String> resp =
+            client.send(req, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
+
+        assertEquals(200, resp.statusCode());
     }
 
     @Test
-    void getMovies_whenEmpty_returnsEmptyArray() throws Exception {
+    void filterNotExistsMovieByYearAndStatusMustBe200AndReturnEmptyArray() throws Exception {
         HttpRequest req = HttpRequest.newBuilder()
-                .uri(URI.create(BASE + "/movies"))
+                .uri(URI.create(BASE + "/movies?year=2025"))
+                .header("Content-Type", "application/json")
                 .GET()
                 .build();
 
-        HttpResponse<String> resp = client.send(req, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
-        assertEquals(200, resp.statusCode(), "GET /movies должен вернуть 200");
+        HttpResponse<String> resp =
+                client.send(req, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
 
-        String contentTypeHeaderValue = resp.headers().firstValue("Content-Type").orElse("");
-        assertEquals("application/json; charset=UTF-8", contentTypeHeaderValue,
-                "Content-Type должен содержать формат данных и кодировку");
+        assertEquals(200, resp.statusCode());
 
         String body = resp.body().trim();
         assertTrue(body.startsWith("[") && body.endsWith("]"),
@@ -65,21 +79,16 @@ public class MoviesApiTest {
     }
 
     @Test
-    void getMovies_ifExists_returnMovies() throws Exception {
+    void filterMovieWithIncorrectYearAndStatusMustBe400AndReturnError() throws Exception {
         HttpRequest req = HttpRequest.newBuilder()
-                .uri(URI.create(BASE + "/movies"))
+                .uri(URI.create(BASE + "/movies?year=2ddd025"))
+                .header("Content-Type", "application/json")
                 .GET()
                 .build();
 
-        moviesStore.add(new Movie("Mortal Combat", 2026));
-        moviesStore.add(new Movie("Dune 2", 2027));
+        HttpResponse<String> resp =
+                client.send(req, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
 
-        HttpResponse<String> resp = client.send(req, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
-        List<Movie> movies = gson.fromJson(resp.body(), new MoviesListTypeToken().getType());
-
-        assertEquals("Dune 2", movies.get(0).getTitle());
-        assertEquals(2027, movies.get(0).getYear());
-        assertEquals("Mortal Combat", movies.get(1).getTitle());
-        assertEquals(2026, movies.get(1).getYear());
+        assertEquals(400, resp.statusCode());
     }
 }
