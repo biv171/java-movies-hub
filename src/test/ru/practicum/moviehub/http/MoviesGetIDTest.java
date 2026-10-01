@@ -48,7 +48,7 @@ public class MoviesGetIDTest {
     @Test
     void searchMovieByIdAndStatusMustBe200() throws Exception {
         HttpRequest req = HttpRequest.newBuilder()
-                .uri(URI.create(BASE + "/movies/1000002"))
+                .uri(URI.create(BASE + "/movies/1000003"))
                 .header("Content-Type", "application/json")
                 .GET()
                 .build();
@@ -57,8 +57,8 @@ public class MoviesGetIDTest {
 
         Movie movie = gson.fromJson(resp.body(), Movie.class);
         assertEquals(200, resp.statusCode());
-        assertEquals("Dune2", movie.getTitle());
-        assertEquals(2027, movie.getYear());
+        assertEquals("Vladimir", movie.getTitle());
+        assertEquals(2013, movie.getYear());
     }
 
     @Test
