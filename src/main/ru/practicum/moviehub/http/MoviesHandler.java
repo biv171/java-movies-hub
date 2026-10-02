@@ -29,6 +29,7 @@ public class MoviesHandler extends BaseHttpHandler {
         String jsonBody = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
         Gson gson = new Gson();
         String path = ex.getRequestURI().getPath();
+        String path8 = path.substring(0,8);
         String query = ex.getRequestURI().getQuery();
 
         switch (method) {
@@ -46,9 +47,22 @@ public class MoviesHandler extends BaseHttpHandler {
 
             case "GET":
                 //GET без параметров
-                if (path.equals("/movies") && query == null) {
+                if (path8.equals("/movies") && query == null) {
                     sendJson(ex,200, gson.toJson(moviesStore.getMovies()));
                     break;
+                }
+                //GET с ID
+                if (path8.equals("/movies/")) {
+                    Integer idp = parseId(path.split("/")[2]);
+                    if (idp == null) {
+                        sendError(ex, 400, "Некорректный ID");
+                        break;
+                    }
+                    if (moviesStore.getMovie(idp) == null) {
+                        sendError(ex, 404, "Фильм не найден");
+                        break;
+                    }
+                    sendJson(ex, 200, gson.toJson(moviesStore.getMovie(idp)));
                 }
 
                 //GET с параметрами ?
@@ -66,19 +80,6 @@ public class MoviesHandler extends BaseHttpHandler {
                         break;
                     }
                 }
-
-                //GET с ID
-                Integer idp = parseId(path.split("/")[2]);
-                if (idp == null) {
-                    sendError(ex,400, "Некорректный ID");
-                    break;
-                }
-                if (moviesStore.getMovie(idp) == null) {
-                    sendError(ex,404, "Фильм не найден");
-                    break;
-                }
-                sendJson(ex,200, gson.toJson(moviesStore.getMovie(idp)));
-
 
             case "POST":
                 //Если ошибка в заголовке
