@@ -112,7 +112,7 @@ public class MoviesHandler extends BaseHttpHandler {
                     sendListError(ex, detailsValues);
                     break;
                 }
-                Movie newMovie = moviesStore.add(new Movie(title, year, moviesStore.getMoviesLength()+1000));
+                Movie newMovie = moviesStore.add(new Movie(title, year, moviesStore.getMoviesLength() + 1000));
                 sendJson(ex,201,"{id :" + newMovie.getId() + "}");
                 break;
         }
