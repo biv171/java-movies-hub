@@ -24,8 +24,8 @@ public class MoviesStore {
             .toList();
     }
 
-    public void delete(Integer id) {
-        movies.remove(id);
+    public boolean delete(Integer id) {
+        return movies.remove(id) != null;
     }
 
     public void clear() {

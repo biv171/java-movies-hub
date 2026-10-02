@@ -33,19 +33,15 @@ public class MoviesHandler extends BaseHttpHandler {
 
         switch (method) {
             case "DELETE":
-                try {
-                    int id = Integer.parseInt(path.split("/")[2]);
-                    if (moviesStore.getMovie(id) != null) {
-                        moviesStore.delete(id);
-                        sendNoContent(ex);
-                    } else {
-                        sendError(ex,404, "Фильм не найден");
-                    }
-                    break;
-                } catch (NumberFormatException e) {
-                    sendError(ex,404, "Некорректный ID");
-                    break;
+                Integer id = parseId(path.split("/")[2]);
+
+                if (id == null) {
+                    sendError(ex,400, "Некорректный ID");
                 }
+                if (!moviesStore.delete(id)) {
+                    sendError(ex,404, "Фильм не найден");
+                }
+                sendNoContent(ex);
 
 
             case "GET":
@@ -72,18 +68,17 @@ public class MoviesHandler extends BaseHttpHandler {
                 }
 
                 //GET с ID
-                try {
-                    int id = Integer.parseInt(path.split("/")[2]);
-                    if (moviesStore.getMovie(id) != null) {
-                        sendJson(ex,200, gson.toJson(moviesStore.getMovie(id)));
-                    } else {
-                        sendError(ex,404, "Фильм не найден");
-                    }
-                    break;
-                } catch (NumberFormatException e) {
+                Integer idp = parseId(path.split("/")[2]);
+                if (idp == null) {
                     sendError(ex,400, "Некорректный ID");
                     break;
                 }
+                if (moviesStore.getMovie(idp) == null) {
+                    sendError(ex,404, "Фильм не найден");
+                    break;
+                }
+                sendJson(ex,200, gson.toJson(moviesStore.getMovie(idp)));
+
 
             case "POST":
                 //Если ошибка в заголовке
@@ -115,6 +110,14 @@ public class MoviesHandler extends BaseHttpHandler {
                 }
                 Movie newMovie = moviesStore.add(new Movie(title, year));
                 sendJson(ex,201,"{id :" + newMovie.getId() + "}");
+        }
+    }
+
+    private Integer parseId(String idPart) {
+        try {
+            return Integer.parseInt(idPart);
+        } catch (NumberFormatException e) {
+            return null;
         }
     }
 }
