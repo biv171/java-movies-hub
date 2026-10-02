@@ -29,7 +29,7 @@ public class MoviesHandler extends BaseHttpHandler {
         String jsonBody = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
         Gson gson = new Gson();
         String path = ex.getRequestURI().getPath();
-        String path8 = path.substring(0,8);
+        String[] pathPart = path.split("/");
         String query = ex.getRequestURI().getQuery();
 
         switch (method) {
@@ -38,21 +38,23 @@ public class MoviesHandler extends BaseHttpHandler {
 
                 if (id == null) {
                     sendError(ex,400, "Некорректный ID");
+                    break;
                 }
                 if (!moviesStore.delete(id)) {
                     sendError(ex,404, "Фильм не найден");
+                    break;
                 }
                 sendNoContent(ex);
-
+                break;
 
             case "GET":
                 //GET без параметров
-                if (path8.equals("/movies") && query == null) {
+                if (pathPart.length == 2 && pathPart[1].equals("movies") && query == null) {
                     sendJson(ex,200, gson.toJson(moviesStore.getMovies()));
                     break;
                 }
                 //GET с ID
-                if (path8.equals("/movies/")) {
+                if (pathPart.length == 3 && pathPart[1].equals("movies") && query == null) {
                     Integer idp = parseId(path.split("/")[2]);
                     if (idp == null) {
                         sendError(ex, 400, "Некорректный ID");
@@ -63,10 +65,11 @@ public class MoviesHandler extends BaseHttpHandler {
                         break;
                     }
                     sendJson(ex, 200, gson.toJson(moviesStore.getMovie(idp)));
+                    break;
                 }
 
                 //GET с параметрами ?
-                if (path.equals("/movies")) {
+                if (query != null) {
                     String queryParametr = query.split("=")[0];
                     String queryValue = query.split("=")[1];
                     try {
@@ -111,6 +114,7 @@ public class MoviesHandler extends BaseHttpHandler {
                 }
                 Movie newMovie = moviesStore.add(new Movie(title, year));
                 sendJson(ex,201,"{id :" + newMovie.getId() + "}");
+                break;
         }
     }
 

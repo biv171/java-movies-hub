@@ -78,6 +78,6 @@ public class MoviesDeleteTest {
                 .build();
 
         HttpResponse<String> resp = client.send(req, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
-        assertEquals(404, resp.statusCode());
+        assertEquals(400, resp.statusCode());
     }
 }
