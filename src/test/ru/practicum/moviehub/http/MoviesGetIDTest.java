@@ -35,9 +35,6 @@ public class MoviesGetIDTest {
     @BeforeEach
     void beforeEach() {
         moviesStore.clear();
-        moviesStore.add(new Movie("Mortal Combat", 2026));
-        moviesStore.add(new Movie("Dune2", 2027));
-        moviesStore.add(new Movie("Vladimir", 2013));
     }
 
     @AfterAll
@@ -47,6 +44,10 @@ public class MoviesGetIDTest {
 
     @Test
     void searchMovieByIdAndStatusMustBe200() throws Exception {
+        moviesStore.add(new Movie("Mortal Combat", 2026));
+        moviesStore.add(new Movie("Dune2", 2027));
+        moviesStore.add(new Movie("Vladimir", 2013));
+
         HttpRequest req = HttpRequest.newBuilder()
                 .uri(URI.create(BASE + "/movies/1000003"))
                 .header("Content-Type", "application/json")
@@ -63,6 +64,10 @@ public class MoviesGetIDTest {
 
     @Test
     void getNotExistsMovieByIdAndStatusMustBe404() throws Exception {
+        moviesStore.add(new Movie("Mortal Combat", 2026));
+        moviesStore.add(new Movie("Dune2", 2027));
+        moviesStore.add(new Movie("Vladimir", 2013));
+
         HttpRequest req = HttpRequest.newBuilder()
                 .uri(URI.create(BASE + "/movies/888"))
                 .header("Content-Type", "application/json")
@@ -75,6 +80,10 @@ public class MoviesGetIDTest {
 
     @Test
     void getMovieByTextIdAndStatusMustBe400() throws Exception {
+        moviesStore.add(new Movie("Mortal Combat", 2026));
+        moviesStore.add(new Movie("Dune2", 2027));
+        moviesStore.add(new Movie("Vladimir", 2013));
+
         HttpRequest req = HttpRequest.newBuilder()
                 .uri(URI.create(BASE + "/movies/a100"))
                 .header("Content-Type", "application/json")
