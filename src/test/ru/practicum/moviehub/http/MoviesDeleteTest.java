@@ -49,7 +49,7 @@ public class MoviesDeleteTest {
     void deleteMovieByIdAndStatusMustBe204() throws Exception {
         HttpRequest req = HttpRequest.newBuilder()
                 .uri(URI.create(BASE + "/movies/1000003"))
-                .header("Content-Type", "application/json")
+                .header("Content-Type","application/json")
                 .DELETE()
                 .build();
 

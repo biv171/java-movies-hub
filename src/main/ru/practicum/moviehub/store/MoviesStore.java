@@ -18,14 +18,20 @@ public class MoviesStore {
         return movies.get(id);
     }
 
+    public boolean checkIdExist(int id) {
+        if (movies.containsKey(id))
+            return true;
+        return false;
+    }
+
     public List<Movie> getMoviesByYear(int tyear) {
         return movies.values().stream()
             .filter(movie -> movie.getYear() == tyear)
             .toList();
     }
 
-    public boolean delete(Integer id) {
-        return movies.remove(id) != null;
+    public void delete(Integer id) {
+        movies.remove(id);
     }
 
     public void clear() {

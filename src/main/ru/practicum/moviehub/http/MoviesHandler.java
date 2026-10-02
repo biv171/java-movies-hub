@@ -40,11 +40,11 @@ public class MoviesHandler extends BaseHttpHandler {
                     sendError(ex,400, "Некорректный ID");
                     break;
                 }
-                if (!moviesStore.delete(id)) {
-                    sendError(ex,404, "Фильм не найден");
+                if (moviesStore.checkIdExist(id)) {
+                    sendNoContent(ex);
                     break;
                 }
-                sendNoContent(ex);
+                sendError(ex,404, "Фильм не найден");
                 break;
 
             case "GET":
