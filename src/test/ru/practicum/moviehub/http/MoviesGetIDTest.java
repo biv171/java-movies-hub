@@ -44,9 +44,9 @@ public class MoviesGetIDTest {
 
     @Test
     void searchMovieByIdAndStatusMustBe200() throws Exception {
-        moviesStore.add(new Movie("Mortal Combat", 2026));
-        moviesStore.add(new Movie("Dune2", 2027));
-        moviesStore.add(new Movie("Vladimir", 2013));
+        moviesStore.add(new Movie("Mortal Combat", 2026, 1000001));
+        moviesStore.add(new Movie("Dune2", 2027, 1000002));
+        moviesStore.add(new Movie("Vladimir", 2013, 1000003));
 
         HttpRequest req = HttpRequest.newBuilder()
                 .uri(URI.create(BASE + "/movies/1000003"))
@@ -64,9 +64,9 @@ public class MoviesGetIDTest {
 
     @Test
     void getNotExistsMovieByIdAndStatusMustBe404() throws Exception {
-        moviesStore.add(new Movie("Mortal Combat", 2026));
-        moviesStore.add(new Movie("Dune2", 2027));
-        moviesStore.add(new Movie("Vladimir", 2013));
+        moviesStore.add(new Movie("Mortal Combat", 2026, 1000001));
+        moviesStore.add(new Movie("Dune2", 2027, 1000002));
+        moviesStore.add(new Movie("Vladimir", 2013, 1000003));
 
         HttpRequest req = HttpRequest.newBuilder()
                 .uri(URI.create(BASE + "/movies/888"))
@@ -80,9 +80,9 @@ public class MoviesGetIDTest {
 
     @Test
     void getMovieByTextIdAndStatusMustBe400() throws Exception {
-        moviesStore.add(new Movie("Mortal Combat", 2026));
-        moviesStore.add(new Movie("Dune2", 2027));
-        moviesStore.add(new Movie("Vladimir", 2013));
+        moviesStore.add(new Movie("Mortal Combat", 2026, 1000001));
+        moviesStore.add(new Movie("Dune2", 2027, 1000002));
+        moviesStore.add(new Movie("Vladimir", 2013, 1000003));
 
         HttpRequest req = HttpRequest.newBuilder()
                 .uri(URI.create(BASE + "/movies/a100"))

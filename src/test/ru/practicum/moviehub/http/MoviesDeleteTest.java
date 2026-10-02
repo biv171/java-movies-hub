@@ -35,9 +35,9 @@ public class MoviesDeleteTest {
     @BeforeEach
     void beforeEach() {
         moviesStore.clear();
-        moviesStore.add(new Movie("Mortal Combat", 2026));
-        moviesStore.add(new Movie("Dune2", 2013));
-        moviesStore.add(new Movie("Vladimir", 2013));
+        moviesStore.add(new Movie("Mortal Combat", 2026, 1000001));
+        moviesStore.add(new Movie("Dune2", 2013, 1000002));
+        moviesStore.add(new Movie("Vladimir", 2013, 1000003));
     }
 
     @AfterAll
@@ -70,7 +70,7 @@ public class MoviesDeleteTest {
     }
 
     @Test
-    void deleteMoviesWithIncorrectIdAndStatusMustBe404WithErrorInBody() throws Exception {
+    void deleteMoviesWithIncorrectIdAndStatusMustBe400WithErrorInBody() throws Exception {
         HttpRequest req = HttpRequest.newBuilder()
                 .uri(URI.create(BASE + "/movies/10g00g00g5"))
                 .header("Content-Type", "application/json")

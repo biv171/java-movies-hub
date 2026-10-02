@@ -36,9 +36,9 @@ public class MoviesFilterTest {
     @BeforeEach
     void beforeEach() {
         moviesStore.clear();
-        moviesStore.add(new Movie("Mortal Combat", 2026));
-        moviesStore.add(new Movie("Dune2", 2013));
-        moviesStore.add(new Movie("Vladimir", 2013));
+        moviesStore.add(new Movie("Mortal Combat", 2026, 1000001));
+        moviesStore.add(new Movie("Dune2", 2013, 1000002));
+        moviesStore.add(new Movie("Vladimir", 2013, 1000003));
     }
 
     @AfterAll

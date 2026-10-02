@@ -52,6 +52,9 @@ public class MoviesApiTest {
                 .GET()
                 .build();
 
+        moviesStore.add(new Movie("Mortal Combat", 2026, 1000001));
+        moviesStore.add(new Movie("Dune 2", 2027, 1000002));
+
         HttpResponse<String> resp = client.send(req, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
         assertEquals(200, resp.statusCode(), "GET /movies должен вернуть 200");
 
@@ -71,8 +74,8 @@ public class MoviesApiTest {
                 .GET()
                 .build();
 
-        moviesStore.add(new Movie("Mortal Combat", 2026));
-        moviesStore.add(new Movie("Dune 2", 2027));
+        moviesStore.add(new Movie("Mortal Combat", 2026, 1000001));
+        moviesStore.add(new Movie("Dune 2", 2027, 1000002));
 
         HttpResponse<String> resp = client.send(req, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
         List<Movie> movies = gson.fromJson(resp.body(), new MoviesListTypeToken().getType());

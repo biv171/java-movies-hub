@@ -38,9 +38,9 @@ public class MoviesPostTest {
     @BeforeEach
     void beforeEach() {
         moviesStore.clear();
-        moviesStore.add(new Movie("Mortal Combat", 2026));
-        moviesStore.add(new Movie("Dune2", 2027));
-        moviesStore.add(new Movie("Vladimir", 2013));
+        moviesStore.add(new Movie("Mortal Combat", 2026, 1000001));
+        moviesStore.add(new Movie("Dune2", 2027, 1000002));
+        moviesStore.add(new Movie("Vladimir", 2013, 1000003));
     }
 
     @AfterAll
@@ -62,7 +62,7 @@ public class MoviesPostTest {
         Movie movie = gson.fromJson(resp.body(), Movie.class);
 
         assertEquals(201, resp.statusCode());
-        assertEquals(1000013, movie.getId());
+        assertEquals(1003, movie.getId());
     }
 
     @Test
