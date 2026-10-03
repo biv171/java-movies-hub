@@ -6,7 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.practicum.moviehub.model.Movie;
 import ru.practicum.moviehub.store.MoviesStore;
-
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -15,10 +15,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.*;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-public class MoviesApiTest {
+public class MoviesGetIDTest {
     private static final String BASE = "http://localhost:8080";
     private static final int port = 8080;
     private static MoviesServer server;
@@ -46,54 +43,54 @@ public class MoviesApiTest {
     }
 
     @Test
-    void getMovies_whenEmpty_returnsEmptyArray() throws Exception {
+    void searchMovieByIdAndStatusMustBe200() throws Exception {
+        moviesStore.add(new Movie("Mortal Combat", 2026, 1000001));
+        moviesStore.add(new Movie("Dune2", 2027, 1000002));
+        moviesStore.add(new Movie("Vladimir", 2013, 1000003));
+
         HttpRequest req = HttpRequest.newBuilder()
-                .uri(URI.create(BASE + "/movies"))
+                .uri(URI.create(BASE + "/movies/1000003"))
+                .header("Content-Type", "application/json")
                 .GET()
                 .build();
 
-        moviesStore.add(new Movie("Mortal Combat", 2026, 1000001));
-        moviesStore.add(new Movie("Dune 2", 2027, 1000002));
-
         HttpResponse<String> resp = client.send(req, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
-        assertEquals(200, resp.statusCode(), "GET /movies должен вернуть 200");
 
-        String contentTypeHeaderValue = resp.headers().firstValue("Content-Type").orElse("");
-        assertEquals("application/json; charset=UTF-8", contentTypeHeaderValue,
-                "Content-Type должен содержать формат данных и кодировку");
-
-        String body = resp.body().trim();
-        assertTrue(body.startsWith("[") && body.endsWith("]"),
-                "Ожидается JSON-массив");
+        Movie movie = gson.fromJson(resp.body(), Movie.class);
+        assertEquals(200, resp.statusCode());
+        assertEquals("Vladimir", movie.getTitle());
+        assertEquals(2013, movie.getYear());
     }
 
     @Test
-    void getMovies_ifExists_returnMovies() throws Exception {
+    void getNotExistsMovieByIdAndStatusMustBe404() throws Exception {
+        moviesStore.add(new Movie("Mortal Combat", 2026, 1000001));
+        moviesStore.add(new Movie("Dune2", 2027, 1000002));
+        moviesStore.add(new Movie("Vladimir", 2013, 1000003));
+
         HttpRequest req = HttpRequest.newBuilder()
-                .uri(URI.create(BASE + "/movies"))
+                .uri(URI.create(BASE + "/movies/888"))
+                .header("Content-Type", "application/json")
                 .GET()
                 .build();
 
-        moviesStore.add(new Movie("Mortal Combat", 2026, 1000001));
-        moviesStore.add(new Movie("Dune 2", 2027, 1000002));
-
         HttpResponse<String> resp = client.send(req, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
-        List<Movie> movies = gson.fromJson(resp.body(), new MoviesListTypeToken().getType());
-
-        assertEquals("Dune 2", movies.get(0).getTitle());
-        assertEquals(2027, movies.get(0).getYear());
-        assertEquals("Mortal Combat", movies.get(1).getTitle());
-        assertEquals(2026, movies.get(1).getYear());
+        assertEquals(404, resp.statusCode());
     }
 
     @Test
-    void incorrectMethodPutStatusMustBe405() throws Exception {
+    void getMovieByTextIdAndStatusMustBe400() throws Exception {
+        moviesStore.add(new Movie("Mortal Combat", 2026, 1000001));
+        moviesStore.add(new Movie("Dune2", 2027, 1000002));
+        moviesStore.add(new Movie("Vladimir", 2013, 1000003));
+
         HttpRequest req = HttpRequest.newBuilder()
-                .uri(URI.create(BASE + "/movies"))
-                .PUT(HttpRequest.BodyPublishers.ofString("example body"))
+                .uri(URI.create(BASE + "/movies/a100"))
+                .header("Content-Type", "application/json")
+                .GET()
                 .build();
 
         HttpResponse<String> resp = client.send(req, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
-        assertEquals(405, resp.statusCode());
+        assertEquals(400, resp.statusCode());
     }
 }
