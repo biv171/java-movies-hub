@@ -85,4 +85,15 @@ public class MoviesApiTest {
         assertEquals("Mortal Combat", movies.get(1).getTitle());
         assertEquals(2026, movies.get(1).getYear());
     }
+
+    @Test
+    void incorrectMethodPutStatusMustBe405() throws Exception {
+        HttpRequest req = HttpRequest.newBuilder()
+                .uri(URI.create(BASE + "/movies"))
+                .PUT(HttpRequest.BodyPublishers.ofString("example body"))
+                .build();
+
+        HttpResponse<String> resp = client.send(req, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
+        assertEquals(405, resp.statusCode());
+    }
 }

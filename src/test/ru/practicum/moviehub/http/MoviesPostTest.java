@@ -130,4 +130,36 @@ public class MoviesPostTest {
         HttpResponse<String> resp = client.send(req, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
         assertEquals(415, resp.statusCode());
     }
+
+    @Test
+    void postNewMovieStatusCodeMustBe201XXX() throws Exception {
+        String jsonBody = "{\"title\":\"Terminator\",\"year\":1990}";
+
+        HttpRequest req1 = HttpRequest.newBuilder()
+                .uri(URI.create(BASE + "/movies"))
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(jsonBody))
+                .build();
+
+        HttpResponse<String> resp1 = client.send(req1, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
+        Movie movie1 = gson.fromJson(resp1.body(), Movie.class);
+        assertEquals(201, resp1.statusCode());
+        assertEquals(1001, movie1.getId());
+
+        //удаляем фильм
+        moviesStore.delete(1001);
+
+        jsonBody = "{\"title\":\"Uncle5\",\"year\":2003}";
+
+        HttpRequest req2 = HttpRequest.newBuilder()
+                .uri(URI.create(BASE + "/movies"))
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(jsonBody))
+                .build();
+
+        HttpResponse<String> resp2 = client.send(req2, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
+        Movie movie2 = gson.fromJson(resp2.body(), Movie.class);
+        assertEquals(201, resp2.statusCode());
+        assertEquals(1002, movie2.getId());
+    }
 }

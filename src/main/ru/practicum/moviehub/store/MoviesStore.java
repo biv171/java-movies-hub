@@ -18,14 +18,8 @@ public class MoviesStore {
         return movies.get(id);
     }
 
-    public int getMoviesLength() {
-        return movies.size();
-    }
-
     public boolean checkIdExist(int id) {
-        if (movies.containsKey(id))
-            return true;
-        return false;
+        return movies.containsKey(id);
     }
 
     public List<Movie> getMoviesByYear(int tyear) {

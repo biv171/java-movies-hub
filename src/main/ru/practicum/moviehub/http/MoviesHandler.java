@@ -11,10 +11,12 @@ import java.util.Map;
 import com.sun.net.httpserver.HttpExchange;
 import ru.practicum.moviehub.model.Movie;
 import ru.practicum.moviehub.store.MoviesStore;
+import java.util.concurrent.atomic.AtomicInteger;
 
 
 public class MoviesHandler extends BaseHttpHandler {
     private final MoviesStore moviesStore;
+    private final AtomicInteger counter = new AtomicInteger(0);
 
     public MoviesHandler(MoviesStore moviesStore) {
         this.moviesStore = moviesStore;
@@ -41,6 +43,7 @@ public class MoviesHandler extends BaseHttpHandler {
                     break;
                 }
                 if (moviesStore.checkIdExist(id)) {
+                    moviesStore.delete(id);
                     sendNoContent(ex);
                     break;
                 }
@@ -83,12 +86,14 @@ public class MoviesHandler extends BaseHttpHandler {
                         break;
                     }
                 }
+                break;
 
             case "POST":
                 //Если ошибка в заголовке
                 Headers requestHeaders = ex.getRequestHeaders();
                 List<String> contentTypeValues = requestHeaders.get("Content-type");
-                if (!contentTypeValues.contains("application/json")) {
+                if (!contentTypeValues.contains("application/json")
+                        && !contentTypeValues.contains("application/json; charset=UTF-8")) {
                     sendError(ex,415,"Неправильное значение заголовка");
                     break;
                 }
@@ -112,9 +117,16 @@ public class MoviesHandler extends BaseHttpHandler {
                     sendListError(ex, detailsValues);
                     break;
                 }
-                Movie newMovie = moviesStore.add(new Movie(title, year, moviesStore.getMoviesLength() + 1000));
-                sendJson(ex,201,"{id :" + newMovie.getId() + "}");
+
+                Movie newMovie = moviesStore.add(
+                        new Movie(title, year, 1000 + counter.incrementAndGet())
+                );
+
+                sendJson(ex,201, gson.toJson(newMovie));
                 break;
+
+            default:
+                sendError(ex, 405, "Некорректный метод");
         }
     }
 
